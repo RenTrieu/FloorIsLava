@@ -8,13 +8,13 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.block.Block;
-import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.Material;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -25,7 +25,7 @@ public class FloorIsLava extends JavaPlugin
     // Also includes spawn blocks
     private ArrayList<Block> placedBlockList;
     // True if challenge is on, false if challenge is off
-    private Boolean pluginState;
+    private Boolean pluginState = false;
     
     /*
      * Initializes scheduler and placedBlockList
@@ -53,6 +53,9 @@ public class FloorIsLava extends JavaPlugin
                 return false;
             }
         }
+        else {
+            return false;
+        }
         
         if (args[0].equalsIgnoreCase("on")) {
             sender.sendMessage(ChatColor.GREEN 
@@ -63,6 +66,7 @@ public class FloorIsLava extends JavaPlugin
         else if (args[0].equalsIgnoreCase("off")) {
             sender.sendMessage(ChatColor.GREEN
                            + "The FloorIsLava challenge is now deactivated.");
+            this.pluginState = false;
             return true;
         }
         else {
@@ -104,7 +108,9 @@ public class FloorIsLava extends JavaPlugin
         Player player = event.getPlayer();
         Location destFloorLoc = event.getTo().clone().subtract(0.0, 1.0, 0.0);
         if (!(this.placedBlockList.contains(destFloorLoc.getBlock()))
-            && (this.pluginState = true)) {
+            && (this.pluginState == true)
+            && (destFloorLoc.getBlock().getBlockData().getMaterial() 
+                != Material.AIR)) {
             player.setHealth(0.0);
         }
     }
