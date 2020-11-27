@@ -60,6 +60,11 @@ public class FloorIsLava extends JavaPlugin
         if (args[0].equalsIgnoreCase("on")) {
             sender.sendMessage(ChatColor.GREEN 
                            + "The FloorIsLava challenge is now activated.");
+            for (Player player : getServer().getOnlinePlayers()) {
+                Location playerStartLoc = player.getLocation().clone();
+                playerStartLoc = playerStartLoc.subtract(0.0, 1.0, 0.0);
+                this.placedBlockList.add(playerStartLoc.getBlock());
+            }
             this.pluginState = true;
             return true;
         }
@@ -107,10 +112,14 @@ public class FloorIsLava extends JavaPlugin
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
         Location destFloorLoc = event.getTo().clone().subtract(0.0, 1.0, 0.0);
-        if (!(this.placedBlockList.contains(destFloorLoc.getBlock()))
+        Block destBlock = destFloorLoc.getBlock();
+        Material destMat = destBlock.getBlockData().getMaterial();
+        if (!(this.placedBlockList.contains(destBlock))
             && (this.pluginState == true)
-            && (destFloorLoc.getBlock().getBlockData().getMaterial() 
-                != Material.AIR)) {
+            && (destMat != Material.AIR)
+            && (!destBlock.isLiquid())
+            && (!destBlock.isEmpty())
+            && (!destBlock.isPassable())) {
             player.setHealth(0.0);
         }
     }
