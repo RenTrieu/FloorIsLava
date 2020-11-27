@@ -1,0 +1,11 @@
+main: v1c4t.floorIsLava.FloorIsLava
+name: FloorIsLava
+version: "0.1"
+api-version: "1.16"
+author: v1c4t
+description: Kills all players who stand on non-player placed blocks
+commands:
+  floorislava:
+    description: Turns the FloorIsLava challenge on or off
+    permission: floorislava.floorislava
+    permission-message: You don't have the floorislava.floorislava permission.

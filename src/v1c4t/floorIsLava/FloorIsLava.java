@@ -1,6 +1,5 @@
 package v1c4t.floorIsLava;
 
-import java.util.UUID;
 import java.util.ArrayList;
 
 import org.bukkit.plugin.java.JavaPlugin;
@@ -10,9 +9,12 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.block.Block;
 import org.bukkit.scheduler.BukkitScheduler;
-import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -22,7 +24,8 @@ public class FloorIsLava extends JavaPlugin
     // Keeps track of all blocks placed by the player
     // Also includes spawn blocks
     private ArrayList<Block> placedBlockList;
-    private BukkitScheduler scheduler;
+    // True if challenge is on, false if challenge is off
+    private Boolean pluginState;
     
     /*
      * Initializes scheduler and placedBlockList
@@ -35,10 +38,9 @@ public class FloorIsLava extends JavaPlugin
             getServer().getPluginCommand(command).setExecutor(this);
         }
         
-        this.scheduler = getServer().getScheduler();
         this.placedBlockList = new ArrayList<Block>();
+        this.pluginState = false;
     }
-    
     
     /*
      * Handles command inputs to turn on/off the FloorIsLava challenge
@@ -51,25 +53,65 @@ public class FloorIsLava extends JavaPlugin
                 return false;
             }
         }
-        return false;
+        
+        if (args[0].equalsIgnoreCase("on")) {
+            sender.sendMessage(ChatColor.GREEN 
+                           + "The FloorIsLava challenge is now activated.");
+            this.pluginState = true;
+            return true;
+        }
+        else if (args[0].equalsIgnoreCase("off")) {
+            sender.sendMessage(ChatColor.GREEN
+                           + "The FloorIsLava challenge is now deactivated.");
+            return true;
+        }
+        else {
+            sendInvalid(sender);
+            return false;
+        }
     }
     
+    /*
+     * When a block is placed, add it to the placedBlockList
+     */
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
-
+        if (this.pluginState == true) {
+            this.placedBlockList.add(event.getBlockPlaced());
+        }
+    }
+    
+    /*
+     * When a player respawns, exempts the block underneath them
+     * from killing them
+     */
+    @EventHandler
+    public void onPlayerRespawn(PlayerRespawnEvent event) {
+        Location spawnBlockLoc = event.getRespawnLocation().clone()
+                                      .subtract(0.0, 1.0, 0.0);
+        if (!(this.placedBlockList.contains(spawnBlockLoc.getBlock()))
+            && (this.pluginState == true)) {
+            this.placedBlockList.add(spawnBlockLoc.getBlock());
+        }
+    }
+    
+    /*
+     * Kills the player if they move onto a block that isn't in
+     * placedBlockList
+     */
+    @EventHandler
+    public void onPlayerMove(PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+        Location destFloorLoc = event.getTo().clone().subtract(0.0, 1.0, 0.0);
+        if (!(this.placedBlockList.contains(destFloorLoc.getBlock()))
+            && (this.pluginState = true)) {
+            player.setHealth(0.0);
+        }
     }
     
     private void sendInvalid(CommandSender sender) {
         sender.sendMessage(ChatColor.RED + "Invalid usage. Please use:");
         sender.sendMessage(ChatColor.RED + "/floorislava on");
         sender.sendMessage(ChatColor.RED + "/floorislava off");
-    }
-    
-    /*
-     * Runnable that checks to see if players are on a manually placed block
-     * or spawn block. If they are not, kills them.
-     */
-    private class FloorLavaTask implements Runnable {
-
     }
 }
