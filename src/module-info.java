@@ -1,0 +1,3 @@
+module floorIsLava {
+    requires spigot;
+}
