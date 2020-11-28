@@ -7,5 +7,5 @@ description: Kills all players who stand on non-player placed blocks
 commands:
   floorislava:
     description: Turns the FloorIsLava challenge on or off
-    permission: floorislava.floorislava
+    permission: floorislava.activator
     permission-message: You don't have the floorislava.floorislava permission.

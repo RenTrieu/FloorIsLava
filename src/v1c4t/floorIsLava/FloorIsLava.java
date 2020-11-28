@@ -55,9 +55,6 @@ public class FloorIsLava extends JavaPlugin
                 return false;
             }
         }
-        else {
-            return false;
-        }
         
         if (args[0].equalsIgnoreCase("on")) {
             sender.sendMessage(ChatColor.GREEN 

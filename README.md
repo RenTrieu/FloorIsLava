@@ -5,7 +5,7 @@ placed blocks. Exempts blocks that players spawn on/the block that players
 are standing on when the plugin is activated.
 
 This is a recreation of the plugin used in 
-[GeorgeNotFound's video](https://www.youtube.com/watch?v=17HqO9O_w54)
+[GeorgeNotFound's video](https://www.youtube.com/watch?v=17HqO9O_w54).
 
 Installation:
 -------------
